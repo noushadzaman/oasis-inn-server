@@ -5,6 +5,9 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+app.use(express.json());
+app.use(cors());
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.x4h5cla.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -41,7 +44,6 @@ async function run() {
     });
 
     app.get("/bookings", async (req, res) => {
-      const email = req.query?.email;
       let query = {};
       if (req.query?.email) {
         query = { email: req.query?.email };
@@ -50,9 +52,23 @@ async function run() {
       res.send(result);
     });
 
-    // app.patch("/roomDetail/:id", (req, res) => {
-
-    // });
+    app.patch("/roomDetail/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedBooking = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateBooked = {
+        $set: {
+          booking: updatedBooking,
+        },
+      };
+      const result = await roomCollection.updateOne(
+        filter,
+        updateBooked,
+        options
+      );
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -65,9 +81,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
-app.use(express.json());
-app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("oasis server");
