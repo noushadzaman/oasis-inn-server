@@ -24,6 +24,7 @@ async function run() {
 
     const roomCollection = client.db("oasisDB").collection("rooms");
     const bookingCollection = client.db("oasisDB").collection("bookings");
+    const reviewCollection = client.db("oasisDB").collection("reviews");
 
     app.get("/rooms", async (req, res) => {
       const result = await roomCollection.find().toArray();
@@ -68,6 +69,17 @@ async function run() {
         options
       );
       res.send(result);
+    });
+
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewCollection.find().toArray();
+      
     });
 
     // Send a ping to confirm a successful connection
