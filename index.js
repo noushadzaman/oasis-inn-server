@@ -78,8 +78,12 @@ async function run() {
     });
 
     app.get("/reviews", async (req, res) => {
-      const result = await reviewCollection.find().toArray();
-      
+      let query = {};
+      if (req.query?.room_id) {
+        query = { room_id: req.query?.room_id };
+      }
+      const result = await reviewCollection.find(query).toArray();
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
