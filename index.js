@@ -53,6 +53,25 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const newBookingDates = req.body;
+      console.log(newBookingDates);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const newBooking = {
+        $set: {
+          bookingDates: newBookingDates,
+        },
+      };
+      const result = await bookingCollection.updateOne(
+        filter,
+        newBooking,
+        options
+      );
+      res.send(result);
+    });
+
     app.patch("/roomDetail/:id", async (req, res) => {
       const id = req.params.id;
       const updatedBooking = req.body;
